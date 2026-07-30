@@ -4,7 +4,7 @@ export function useTelegram() {
   // Check if running inside Telegram
   const isTelegram = (() => {
     try {
-      return !!(window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram?.WebApp?.initData;
+      return typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.platform !== 'unknown';
     } catch {
       return false;
     }
@@ -12,7 +12,7 @@ export function useTelegram() {
 
   const hapticFeedback = () => {
     try {
-      if (isTelegram) {
+      if ((window as any).Telegram?.WebApp?.HapticFeedback) {
         WebApp.HapticFeedback.impactOccurred('light');
       }
     } catch {
@@ -22,7 +22,7 @@ export function useTelegram() {
 
   const hapticSuccess = () => {
     try {
-      if (isTelegram) {
+      if ((window as any).Telegram?.WebApp?.HapticFeedback) {
         WebApp.HapticFeedback.notificationOccurred('success');
       }
     } catch {
