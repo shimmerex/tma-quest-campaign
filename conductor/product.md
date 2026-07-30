@@ -1,13 +1,13 @@
-# Product Definition: Shimmer TMA Lab (Telegram Mini App)
+# Product Definition: Quest & Airdrop Platform (Clicker TMA)
 
-## Core Concept
-We are building a Telegram Mini App (TMA). This is a Single Page Application (SPA) loaded inside a Telegram WebApp iframe. The product must feel like a native Telegram feature, not a regular website.
+## Product Essence
 
-## Target Audience
-Crypto enthusiasts, Web3 users, and Telegram communities. The user expects instant load times, seamless wallet connection, and native mobile interactions.
+A reference Telegram Mini App (TMA) showcasing "Tap-to-Earn" mechanics and a Quests system for future airdrops. The app serves as a portfolio piece for client demonstrations.
 
-## Key Design Principles
-1. **Illusion of Native:** The app must seamlessly blend with the user's Telegram theme (Dark/Light).
-2. **Mobile-First Absolute:** The app will strictly be used on mobile devices. Desktop layout is irrelevant and should not be considered. Maximum container width is 480px.
-3. **Frictionless Web3:** Wallet connection (TON Connect) and transactions must be intuitive, with clear loading states and error handling.
-4. **Haptic Feedback:** Every significant user interaction (button click, success, error) must trigger Telegram's native haptic feedback.
+## Key Features
+
+1. **Tap Mechanic:** Main screen with a large interactive button/coin. Tapping increases the point balance.
+2. **Visual & Haptic Feedback:** Mandatory Telegram HapticFeedback on every tap. Visual CSS animation of coins/numbers (+1) flying from the exact tap coordinates.
+3. **Quests:** A dedicated section listing tasks (e.g., "Connect TON Wallet", "Subscribe to Channel"). Rewards are granted upon completion.
+4. **State Management:** Local persistence of user progress (balance and quest status) to prevent data loss on reload.
+5. **TON Connect:** Wallet integration to demonstrate Web3 capabilities.

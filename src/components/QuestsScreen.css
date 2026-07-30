@@ -1,0 +1,182 @@
+.quests-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quests-header {
+  margin-bottom: 24px;
+}
+
+.quests-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--tg-theme-text-color, #ffffff);
+  margin: 0 0 16px;
+}
+
+.quests-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quests-progress-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tg-theme-hint-color, #8b8fa3);
+}
+
+.quests-progress-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+}
+
+.quests-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--game-accent), var(--game-accent-alt));
+  transition: width 0.5s ease;
+}
+
+/* Quest Cards */
+.quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quest-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--game-border-alpha, rgba(255, 255, 255, 0.06));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.quest-card:not(.quest-completed):active {
+  transform: scale(0.98);
+}
+
+.quest-completed {
+  opacity: 0.6;
+  border-color: color-mix(in srgb, var(--game-success) 20%, transparent);
+}
+
+.quest-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quest-icon {
+  font-size: 24px;
+}
+
+.quest-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.quest-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, #ffffff);
+  margin: 0 0 3px;
+}
+
+.quest-description {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color, #8b8fa3);
+  margin: 0 0 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quest-reward {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quest-reward-icon {
+  font-size: 14px;
+}
+
+.quest-reward-amount {
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--game-coin-primary), var(--game-coin-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.quest-action {
+  width: 48px;
+  height: 34px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  background: var(--tg-theme-button-color, #7c4dff);
+  color: var(--tg-theme-button-text-color, #ffffff);
+}
+
+.quest-action:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.quest-action-done {
+  background: color-mix(in srgb, var(--game-success) 20%, transparent);
+  color: var(--game-success);
+  cursor: default;
+}
+
+/* Wallet status */
+.wallet-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--game-success) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--game-success) 20%, transparent);
+}
+
+.wallet-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--game-success);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--game-success) 50%, transparent);
+}
+
+.wallet-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tg-theme-hint-color, #8b8fa3);
+  font-family: monospace;
+}

@@ -1,0 +1,8 @@
+Create a Telegram Mini App clicker based on this repository.
+
+Implement a 'Tap' screen with a large central coin. On click, increase the balance, trigger Telegram HapticFeedback (impactOccurred 'light'), and spawn a CSS animation of '+1' flying from the exact click coordinates. The flying number elements must be removed from the DOM after the animation completes.
+
+Create a 'Quests' screen with a task list. Add one functional task: 'Connect Wallet'. The button must trigger the TON Connect modal.
+
+Implement a Zustand store to hold the global user balance and quest completion status, persisting this data locally.
+Break this down into the following Phases: UI/Layout, State Management, Animations & Haptics, and TON Connect Integration.
