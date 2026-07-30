@@ -15,7 +15,53 @@
   font-size: 28px;
   font-weight: 800;
   color: var(--tg-theme-text-color, #ffffff);
-  margin: 0 0 16px;
+  margin: 0;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 12px;
+  color: var(--tg-theme-text-color, #ffffff);
+}
+
+.streak-days {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.streak-day {
+  flex: 0 0 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--game-border-alpha, rgba(255, 255, 255, 0.06));
+  border-radius: 12px;
+}
+
+.streak-day-done {
+  opacity: 0.5;
+  background: transparent;
+}
+
+.streak-day-active {
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.1));
+  border-color: var(--game-accent);
+}
+
+.streak-day-label {
+  font-size: 11px;
+  color: var(--tg-theme-hint-color, #8b8fa3);
+}
+
+.streak-day-reward {
+  font-size: 20px;
 }
 
 .quests-progress {

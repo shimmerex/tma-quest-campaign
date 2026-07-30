@@ -52,6 +52,19 @@ export function QuestsScreen() {
         </div>
       </div>
 
+      <div className="daily-streak">
+        <h2 className="section-title">Daily Streak</h2>
+        <div className="streak-days">
+          {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+            <div key={day} className={`streak-day ${day === 3 ? 'streak-day-active' : ''} ${day < 3 ? 'streak-day-done' : ''}`}>
+              <div className="streak-day-label">Day {day}</div>
+              <div className="streak-day-reward">🪙</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <h2 className="section-title" style={{ marginTop: '24px' }}>Tasks</h2>
       <div className="quest-list">
         {quests.map((quest) => (
           <div
@@ -82,15 +95,6 @@ export function QuestsScreen() {
           </div>
         ))}
       </div>
-
-      {wallet && (
-        <div className="wallet-status">
-          <span className="wallet-dot" />
-          <span className="wallet-text">
-            {wallet.account.address.slice(0, 6)}...{wallet.account.address.slice(-4)}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

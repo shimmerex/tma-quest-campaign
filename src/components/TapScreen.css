@@ -87,6 +87,14 @@
   transform: scale(0.92);
 }
 
+.coin-disabled {
+  filter: grayscale(1) opacity(0.5);
+  cursor: not-allowed;
+}
+.coin-disabled:active {
+  transform: scale(1);
+}
+
 .coin:active ~ .coin-glow {
   filter: brightness(1.5);
 }

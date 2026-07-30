@@ -1,0 +1,120 @@
+.boosts-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.boosts-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.boosts-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--tg-theme-text-color, #ffffff);
+  margin: 0;
+}
+
+.boosts-balance {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--game-coin-primary);
+  background: var(--game-surface-alpha, rgba(255,255,255,0.08));
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+
+.boosts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.boost-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--game-border-alpha, rgba(255, 255, 255, 0.06));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.boost-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 24px;
+}
+
+.boost-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.boost-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tg-theme-text-color, #ffffff);
+  margin: 0 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boost-level {
+  font-size: 11px;
+  background: var(--game-accent);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.boost-description {
+  font-size: 12px;
+  color: var(--tg-theme-hint-color, #8b8fa3);
+  margin: 0 0 4px;
+}
+
+.boost-effect {
+  font-size: 11px;
+  color: var(--game-success);
+  font-weight: 600;
+}
+
+.boost-action {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+  background: var(--game-accent);
+  color: var(--tg-theme-button-text-color, #ffffff);
+}
+
+.boost-action:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.boost-action-disabled {
+  background: var(--game-surface-alpha, rgba(255, 255, 255, 0.1));
+  color: var(--tg-theme-hint-color, #8b8fa3);
+  cursor: not-allowed;
+}
