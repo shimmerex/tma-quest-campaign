@@ -1,10 +1,15 @@
-import WebApp from '@twa-dev/sdk';
-
 export function useTelegram() {
-  // Check if running inside Telegram
+  const getWebApp = () => {
+    if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
+      return (window as any).Telegram.WebApp;
+    }
+    return null;
+  };
+
   const isTelegram = (() => {
     try {
-      return typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.platform !== 'unknown';
+      const webApp = getWebApp();
+      return webApp && webApp.platform !== 'unknown';
     } catch {
       return false;
     }
@@ -12,8 +17,9 @@ export function useTelegram() {
 
   const hapticFeedback = () => {
     try {
-      if (WebApp.isVersionAtLeast('6.1')) {
-        WebApp.HapticFeedback.impactOccurred('light');
+      const webApp = getWebApp();
+      if (webApp?.HapticFeedback) {
+        webApp.HapticFeedback.impactOccurred('light');
       }
     } catch {
       // Silently fail outside Telegram
@@ -22,8 +28,9 @@ export function useTelegram() {
 
   const hapticSuccess = () => {
     try {
-      if (WebApp.isVersionAtLeast('6.1')) {
-        WebApp.HapticFeedback.notificationOccurred('success');
+      const webApp = getWebApp();
+      if (webApp?.HapticFeedback) {
+        webApp.HapticFeedback.notificationOccurred('success');
       }
     } catch {
       // Silently fail
@@ -32,7 +39,10 @@ export function useTelegram() {
 
   const expand = () => {
     try {
-      WebApp.expand();
+      const webApp = getWebApp();
+      if (webApp) {
+        webApp.expand();
+      }
     } catch {
       // Silently fail
     }
@@ -40,7 +50,10 @@ export function useTelegram() {
 
   const ready = () => {
     try {
-      WebApp.ready();
+      const webApp = getWebApp();
+      if (webApp) {
+        webApp.ready();
+      }
     } catch {
       // Silently fail
     }
