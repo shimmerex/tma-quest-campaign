@@ -12,7 +12,7 @@ export function useTelegram() {
 
   const hapticFeedback = () => {
     try {
-      if ((window as any).Telegram?.WebApp?.HapticFeedback) {
+      if (WebApp.isVersionAtLeast('6.1')) {
         WebApp.HapticFeedback.impactOccurred('light');
       }
     } catch {
@@ -22,7 +22,7 @@ export function useTelegram() {
 
   const hapticSuccess = () => {
     try {
-      if ((window as any).Telegram?.WebApp?.HapticFeedback) {
+      if (WebApp.isVersionAtLeast('6.1')) {
         WebApp.HapticFeedback.notificationOccurred('success');
       }
     } catch {
@@ -32,9 +32,15 @@ export function useTelegram() {
 
   const expand = () => {
     try {
-      if (isTelegram) {
-        WebApp.expand();
-      }
+      WebApp.expand();
+    } catch {
+      // Silently fail
+    }
+  };
+
+  const ready = () => {
+    try {
+      WebApp.ready();
     } catch {
       // Silently fail
     }
@@ -45,5 +51,6 @@ export function useTelegram() {
     hapticFeedback,
     hapticSuccess,
     expand,
+    ready,
   };
 }

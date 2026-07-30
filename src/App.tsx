@@ -7,12 +7,13 @@ import './App.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'tap' | 'quests'>('tap');
-  const { expand } = useTelegram();
+  const { expand, ready } = useTelegram();
 
   useEffect(() => {
-    // Expand to full height in Telegram
+    // Notify Telegram that the app is ready and expand to full height
+    ready();
     expand();
-  }, [expand]);
+  }, [expand, ready]);
 
   return (
     <div className="app-container">
