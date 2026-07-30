@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "conductor": {
+      "command": "npx",
+      "args": ["-y", "@gemini-cli-extensions/conductor"]
+    },
+    "security": {
+      "command": "npx",
+      "args": ["-y", "@gemini-cli-extensions/security"]
+    },
+    "domscribe": {
+      "command": "npx",
+      "args": ["-y", "@patchorbit/domscribe"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7"]
+    }
+  }
+}

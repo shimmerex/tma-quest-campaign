@@ -1,0 +1,1 @@
+We are building a Telegram Mini App (TMA). This is a Single Page Application loaded inside a Telegram WebApp iframe. The product must feel like a native Telegram feature. Mobile-First Absolute. Max width 480px.

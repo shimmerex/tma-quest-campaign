@@ -1,0 +1,1 @@
+Build Tool: Vite. Framework: React 18+ (TypeScript is MANDATORY). Architecture: Client-side rendering only. Telegram SDK: @twa-dev/sdk. Web3: @tonconnect/ui-react. State: zustand. Styling: Tailwind CSS.

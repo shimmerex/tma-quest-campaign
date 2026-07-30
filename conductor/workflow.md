@@ -1,0 +1,1 @@
+You MUST use Telegram's CSS variables for ALL colors (e.g., var(--tg-theme-bg-color)). NEVER use Tailwind color classes for structural elements. Always call WebApp.ready() at root. Always wrap clickable elements with WebApp.HapticFeedback.impactOccurred('light').
