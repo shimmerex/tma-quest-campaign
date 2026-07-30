@@ -15,11 +15,13 @@ function App() {
   const claimOfflineEarnings = useGameStore((s) => s.claimOfflineEarnings);
   const hasOnboarded = useGameStore((s) => s.hasOnboarded);
   const completeOnboarding = useGameStore((s) => s.completeOnboarding);
+  const calculateSecureOfflineEarnings = useGameStore((s) => s.calculateSecureOfflineEarnings);
 
   useEffect(() => {
     ready();
     expand();
-  }, [expand, ready]);
+    calculateSecureOfflineEarnings();
+  }, [expand, ready, calculateSecureOfflineEarnings]);
 
   const handleClaimOffline = () => {
     claimOfflineEarnings();

@@ -1,5 +1,40 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+// Simple hash function for anti-cheat signature
+const hashState = (str: string) => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash.toString(16);
+};
+
+const secureStorage = {
+  getItem: (name: string) => {
+    const item = localStorage.getItem(name);
+    if (!item) return null;
+    try {
+      const parsed = JSON.parse(atob(item));
+      if (parsed.signature !== hashState(JSON.stringify(parsed.state))) {
+        console.error('State tampering detected, resetting progress.');
+        return null;
+      }
+      return JSON.stringify(parsed.state);
+    } catch {
+      return null;
+    }
+  },
+  setItem: (name: string, value: string) => {
+    const stateObj = JSON.parse(value);
+    const signature = hashState(value);
+    const securePayload = btoa(JSON.stringify({ state: stateObj, signature }));
+    localStorage.setItem(name, securePayload);
+  },
+  removeItem: (name: string) => localStorage.removeItem(name),
+};
 
 export interface Quest {
   id: string;
@@ -35,6 +70,7 @@ interface GameState {
   offlineEarnings: number;
   lastLogin: number;
   hasOnboarded: boolean;
+  isProcessing: boolean;
   incrementBalance: () => void;
   claimOfflineEarnings: () => void;
   completeOnboarding: () => void;
@@ -43,6 +79,7 @@ interface GameState {
   consumeEnergy: () => boolean;
   regenEnergy: () => void;
   refillEnergy: () => void;
+  calculateSecureOfflineEarnings: () => Promise<void>;
 }
 
 export const useGameStore = create<GameState>()(
@@ -52,12 +89,13 @@ export const useGameStore = create<GameState>()(
       energy: 1000,
       maxEnergy: 1000,
       tapPower: 1,
-      energyRegenRate: 1, // 1 energy per second
+      energyRegenRate: 1,
       profitPerHour: 0,
       lastEnergyUpdate: Date.now(),
       lastLogin: Date.now(),
       offlineEarnings: 0,
       hasOnboarded: false,
+      isProcessing: false,
       quests: [
         {
           id: 'connect-wallet',
@@ -164,12 +202,14 @@ export const useGameStore = create<GameState>()(
       ],
       buyUpgrade: (id: string) =>
         set((state) => {
+          if (state.isProcessing) return state; // Transaction lock to prevent double-spending
           const upgrade = state.upgrades.find((u) => u.id === id);
           if (!upgrade) return state;
 
           const currentCost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
-          
           if (state.balance < currentCost) return state;
+
+          set({ isProcessing: true }); // Lock
 
           const newLevel = upgrade.level + 1;
           const newUpgrades = state.upgrades.map((u) =>
@@ -198,47 +238,63 @@ export const useGameStore = create<GameState>()(
             maxEnergy: newMaxEnergy,
             energyRegenRate: newRegenRate,
             profitPerHour: newProfitPerHour,
+            isProcessing: false, // Unlock
           };
         }),
       completeQuest: (id: string) =>
         set((state) => {
+          if (state.isProcessing) return state;
           const quest = state.quests.find((q) => q.id === id);
           if (!quest || quest.completed) return state;
+          
+          set({ isProcessing: true });
           return {
             quests: state.quests.map((q) =>
               q.id === id ? { ...q, completed: true } : q
             ),
             balance: state.balance + quest.reward,
+            isProcessing: false,
           };
         }),
       claimOfflineEarnings: () =>
         set((state) => ({
           balance: state.balance + state.offlineEarnings,
           offlineEarnings: 0,
-          lastLogin: Date.now(),
         })),
       completeOnboarding: () =>
         set((state) => {
           if (state.hasOnboarded) return state;
           return { hasOnboarded: true, balance: state.balance + 1000 };
         }),
+      calculateSecureOfflineEarnings: async () => {
+        const state = get();
+        if (state.profitPerHour <= 0) return;
+        
+        try {
+          // Fetch secure time to prevent local clock manipulation
+          const res = await fetch('http://worldtimeapi.org/api/timezone/Etc/UTC');
+          const data = await res.json();
+          const serverTime = new Date(data.utc_datetime).getTime();
+          
+          const hoursPassed = (serverTime - state.lastLogin) / (1000 * 60 * 60);
+          const cappedHours = Math.max(0, Math.min(hoursPassed, 12));
+          const earned = Math.floor(state.profitPerHour * cappedHours);
+          
+          if (earned > 0) {
+            set({ offlineEarnings: earned, lastLogin: serverTime });
+          } else {
+            set({ lastLogin: serverTime });
+          }
+        } catch (e) {
+          // Fallback if API fails, but prevent exploits by not rewarding huge gaps
+          console.warn('Failed to fetch secure time');
+          set({ lastLogin: Date.now() });
+        }
+      },
     }),
     {
       name: 'tma-quest-storage',
-      onRehydrateStorage: () => (state) => {
-        if (state) {
-          const now = Date.now();
-          const hoursPassed = (now - state.lastLogin) / (1000 * 60 * 60);
-          // Cap offline earnings to 12 hours max
-          const cappedHours = Math.min(hoursPassed, 12);
-          const offlineEarnings = Math.floor(state.profitPerHour * cappedHours);
-          
-          if (offlineEarnings > 0) {
-            state.offlineEarnings = offlineEarnings;
-          }
-          state.lastLogin = now;
-        }
-      },
+      storage: createJSONStorage(() => secureStorage),
     }
   )
 );
