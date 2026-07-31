@@ -48,7 +48,7 @@ interface GameState {
   regenEnergy: () => void;
 }
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 const DEFAULT_UPGRADES: Upgrade[] = [
   { id: 'multitap', name: 'Multi-Tap', description: 'Increase points per tap', level: 0, baseCost: 100, costMultiplier: 2, effectType: 'tapPower', effectBase: 1, icon: '👆' },
