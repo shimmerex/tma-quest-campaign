@@ -110,8 +110,11 @@ export const useGameStore = create<GameState>((set, get) => ({
           lastEnergyUpdate: Date.now(),
           upgrades: mergedUpgrades
         });
+      } else {
+        alert('Server error: ' + JSON.stringify(data));
       }
-    } catch (e) {
+    } catch (e: any) {
+      alert(`Network Error! VITE_API_URL is: ${API_URL}. Error details: ${e.message}`);
       console.error('Failed to sync with server:', e);
     }
   },
