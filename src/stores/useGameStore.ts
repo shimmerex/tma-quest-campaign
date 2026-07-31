@@ -23,6 +23,7 @@ export interface Upgrade {
 
 interface GameState {
   tgId: string;
+  username: string;
   balance: number;
   energy: number;
   maxEnergy: number;
@@ -37,7 +38,7 @@ interface GameState {
   hasOnboarded: boolean;
   isProcessing: boolean;
   pendingTaps: number;
-  setTgId: (id: string) => void;
+  setTgId: (id: string, username: string) => void;
   syncWithServer: () => Promise<void>;
   syncTaps: () => Promise<void>;
   claimOfflineEarnings: () => void;
@@ -58,7 +59,8 @@ const DEFAULT_UPGRADES: Upgrade[] = [
 ];
 
 export const useGameStore = create<GameState>((set, get) => ({
-  tgId: 'mock-user-123', // Default for local dev, overridden by App.tsx
+  tgId: 'mock-user-123',
+  username: 'MockUser',
   balance: 0,
   energy: 1000,
   maxEnergy: 1000,
@@ -77,15 +79,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   ],
   upgrades: DEFAULT_UPGRADES,
 
-  setTgId: (id: string) => set({ tgId: id }),
+  setTgId: (id: string, username: string) => set({ tgId: id, username }),
 
   syncWithServer: async () => {
-    const { tgId } = get();
+    const { tgId, username } = get();
     try {
       const res = await fetch(`${API_URL}/auth/sync`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tgId })
+        body: JSON.stringify({ tgId, username })
       });
       const data = await res.json();
       if (data.user) {

@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "prisma generate",
     "build": "tsc",
-    "dev": "nodemon index.ts",
+    "dev": "tsx watch index.ts",
     "start": "node dist/index.js"
   },
   "keywords": [],
@@ -26,9 +26,8 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
     "@types/pg": "^8.20.0",
-    "nodemon": "^3.1.14",
     "prisma": "^7.9.1",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.23.1",
     "typescript": "^7.0.2"
   }
 }

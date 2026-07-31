@@ -23,9 +23,10 @@ function App() {
     ready();
     expand();
     
-    // In production, we'd pull from window.Telegram.WebApp.initDataUnsafe?.user?.id
-    const mockTgId = 'mock-user-123';
-    setTgId(mockTgId);
+    const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
+    const realTgId = tgUser?.id?.toString() || 'mock-user-123';
+    const realUsername = tgUser?.username || 'MockUser';
+    setTgId(realTgId, realUsername);
     
     syncWithServer();
 
