@@ -36,6 +36,7 @@ interface GameState {
   offlineEarnings: number;
   lastLogin: number;
   hasOnboarded: boolean;
+  isLoading: boolean;
   isProcessing: boolean;
   pendingTaps: number;
   setTgId: (id: string, username: string) => void;
@@ -111,6 +112,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   lastLogin: Date.now(),
   offlineEarnings: 0,
   hasOnboarded: false,
+  isLoading: true,
   isProcessing: false,
   pendingTaps: 0,
   quests: [
@@ -160,18 +162,19 @@ export const useGameStore = create<GameState>((set, get) => ({
           energyRegenRate: data.user.energyRegenRate,
           profitPerHour: data.user.profitPerHour,
           offlineEarnings: data.offlineEarnings,
-          lastLogin: new Date(data.user.lastLogin).getTime(),
+          hasOnboarded: data.user.hasOnboarded,
           lastEnergyUpdate: Date.now(),
           upgrades: mergedUpgrades,
+          isLoading: false
         });
       } else {
-        alert("Server error: " + JSON.stringify(data));
+        alert('Server error: ' + JSON.stringify(data));
+        set({ isLoading: false });
       }
     } catch (e: any) {
-      alert(
-        `Network Error! VITE_API_URL is: ${API_URL}. Error details: ${e.message}`,
-      );
-      console.error("Failed to sync with server:", e);
+      alert(`Network Error! VITE_API_URL is: ${API_URL}. Error details: ${e.message}`);
+      console.error('Failed to sync with server:', e);
+      set({ isLoading: false });
     }
   },
 
@@ -277,12 +280,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     // Optimistic update
     set(state => ({ hasOnboarded: true, balance: state.balance + 1000 }));
     try {
-      await fetch(`${API_URL}/user/onboard`, {
+      const res = await fetch(`${API_URL}/user/onboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tgId })
       });
-    } catch (e) {
+      if (!res.ok) {
+        const err = await res.text();
+        alert(`Failed to onboard on server: ${res.status} - ${err}`);
+      }
+    } catch (e: any) {
+      alert(`Network error during onboard: ${e.message}`);
       console.error('Failed to onboard', e);
     }
   },

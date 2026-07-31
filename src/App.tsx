@@ -14,6 +14,7 @@ function App() {
   const offlineEarnings = useGameStore((s) => s.offlineEarnings);
   const claimOfflineEarnings = useGameStore((s) => s.claimOfflineEarnings);
   const hasOnboarded = useGameStore((s) => s.hasOnboarded);
+  const isLoading = useGameStore((s) => s.isLoading);
   const completeOnboarding = useGameStore((s) => s.completeOnboarding);
   const syncWithServer = useGameStore((s) => s.syncWithServer);
   const syncTaps = useGameStore((s) => s.syncTaps);
@@ -47,6 +48,15 @@ function App() {
     completeOnboarding();
     hapticSuccess();
   };
+
+  if (isLoading) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#000', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+        <div style={{ fontSize: '48px', animation: 'pulseGlow 2s infinite' }}>⌛</div>
+        <p style={{ marginTop: '16px', fontWeight: 'bold' }}>Loading your game data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
