@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://tma-quest-campaign-production-fbd5.up.railway.app/api/:path*"
+    }
+  ]
+}
