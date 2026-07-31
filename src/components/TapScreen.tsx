@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect, useState, type MouseEvent } from 'react';
+import React, { useCallback, useRef, useEffect, useState } from 'react';
 import { useGameStore } from '../stores/useGameStore';
 import { useTelegram } from '../hooks/useTelegram';
 import { useTonWallet, useTonConnectUI } from '@tonconnect/ui-react';
@@ -28,7 +28,11 @@ export function TapScreen() {
   }, [regenEnergy]);
 
   const handleTap = useCallback(
-    (e: MouseEvent<HTMLDivElement>) => {
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      // Prevent default to stop text selection / ghost clicks
+      // Note: React's synthetic event preventDefault doesn't always work for touch actions, 
+      // so CSS user-select is also important.
+
       if (!consumeEnergy()) {
         // Optional: play an error haptic if out of energy
         return;
@@ -36,9 +40,15 @@ export function TapScreen() {
 
       hapticFeedback();
       
+      // Limit active particles to prevent DOM lag
+      const activeParticles = document.querySelectorAll('.tap-particle');
+      if (activeParticles.length > 20) {
+        activeParticles[0].remove();
+      }
+
       // Create flying coin animation natively
       const coin = document.createElement('div');
-      coin.className = 'flying-coin';
+      coin.className = 'tap-particle';
       coin.textContent = `+${tapPower}`;
       
       const rect = containerRef.current?.getBoundingClientRect();
@@ -95,26 +105,36 @@ export function TapScreen() {
 
   return (
     <div className="tap-screen" ref={containerRef}>
-      <div className="tap-header" style={{ position: 'relative' }}>
-        <button 
-          className="profile-btn" 
-          onClick={() => setShowProfile(true)}
-          style={{ position: 'absolute', left: 0, top: 0, width: '40px', height: '40px', borderRadius: '20px', background: 'var(--game-surface-alpha)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer' }}
-        >
-          👤
-        </button>
-        <div className="league-badge" style={{ color: currentLeague.color, fontSize: '14px', fontWeight: 'bold', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-          {currentLeague.name} League
-        </div>
-        <div className="balance-value">
-          <span className="balance-icon">🪙</span>
-          <span className="balance-number">{formatBalance(balance)}</span>
-        </div>
-        {nextLeague && (
-          <div className="league-progress-container" style={{ width: '150px', height: '6px', background: 'var(--game-surface-alpha)', borderRadius: '4px', margin: '12px auto 0', overflow: 'hidden' }}>
-            <div className="league-progress-fill" style={{ width: `${leagueProgress}%`, height: '100%', background: currentLeague.color, transition: 'width 0.3s ease' }} />
+      <div className="tap-header" style={{ width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+          <button 
+            className="profile-btn" 
+            onClick={() => setShowProfile(true)}
+            style={{ width: '44px', height: '44px', borderRadius: '22px', background: 'var(--game-surface-alpha)', border: '1px solid var(--game-border-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer', outline: 'none' }}
+          >
+            👤
+          </button>
+          
+          <div className="league-info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, margin: '0 16px' }}>
+            <div className="league-badge" style={{ color: currentLeague.color, fontSize: '13px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              {currentLeague.name} League
+            </div>
+            {nextLeague && (
+              <div className="league-progress-container" style={{ width: '100%', maxWidth: '140px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '6px', overflow: 'hidden' }}>
+                <div className="league-progress-fill" style={{ width: `${leagueProgress}%`, height: '100%', background: currentLeague.color, transition: 'width 0.3s ease' }} />
+              </div>
+            )}
           </div>
-        )}
+
+          <div style={{ width: '44px' }} /> {/* Spacer to balance header */}
+        </div>
+
+        <div className="balance-value" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span className="balance-icon" style={{ fontSize: '48px' }}>🪙</span>
+            <span className="balance-number" style={{ fontSize: '56px', fontWeight: '900' }}>{formatBalance(balance)}</span>
+          </div>
+        </div>
       </div>
 
       <div className="coin-area">
@@ -122,7 +142,8 @@ export function TapScreen() {
         <div
           ref={coinRef}
           className={`coin ${!hasEnergy ? 'coin-disabled' : ''}`}
-          onClick={hasEnergy ? handleTap : undefined}
+          onPointerDown={hasEnergy ? handleTap : undefined}
+          style={{ touchAction: 'none' }}
           role="button"
           tabIndex={0}
           id="tap-coin"
