@@ -15,13 +15,27 @@ function App() {
   const claimOfflineEarnings = useGameStore((s) => s.claimOfflineEarnings);
   const hasOnboarded = useGameStore((s) => s.hasOnboarded);
   const completeOnboarding = useGameStore((s) => s.completeOnboarding);
-  const calculateSecureOfflineEarnings = useGameStore((s) => s.calculateSecureOfflineEarnings);
+  const syncWithServer = useGameStore((s) => s.syncWithServer);
+  const syncTaps = useGameStore((s) => s.syncTaps);
+  const setTgId = useGameStore((s) => s.setTgId);
 
   useEffect(() => {
     ready();
     expand();
-    calculateSecureOfflineEarnings();
-  }, [expand, ready, calculateSecureOfflineEarnings]);
+    
+    // In production, we'd pull from window.Telegram.WebApp.initDataUnsafe?.user?.id
+    const mockTgId = 'mock-user-123';
+    setTgId(mockTgId);
+    
+    syncWithServer();
+
+    // Setup periodic sync for batched taps every 2 seconds
+    const interval = setInterval(() => {
+      syncTaps();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [expand, ready, syncWithServer, syncTaps, setTgId]);
 
   const handleClaimOffline = () => {
     claimOfflineEarnings();

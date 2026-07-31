@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id              String   @id // Telegram User ID
+  username        String?
+  balance         Int      @default(0)
+  energy          Int      @default(1000)
+  maxEnergy       Int      @default(1000)
+  tapPower        Int      @default(1)
+  energyRegenRate Int      @default(1)
+  profitPerHour   Int      @default(0)
+  lastLogin       DateTime @default(now())
+  hasOnboarded    Boolean  @default(false)
+  
+  upgrades        UserUpgrade[]
+  quests          UserQuest[]
+}
+
+model UserUpgrade {
+  id        String @id @default(uuid())
+  userId    String
+  upgradeId String
+  level     Int    @default(0)
+  user      User   @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, upgradeId])
+}
+
+model UserQuest {
+  id        String @id @default(uuid())
+  userId    String
+  questId   String
+  completed Boolean @default(false)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@unique([userId, questId])
+}

@@ -9,7 +9,6 @@ export function TapScreen() {
   const energy = useGameStore((s) => s.energy);
   const maxEnergy = useGameStore((s) => s.maxEnergy);
   const tapPower = useGameStore((s) => s.tapPower);
-  const incrementBalance = useGameStore((s) => s.incrementBalance);
   const consumeEnergy = useGameStore((s) => s.consumeEnergy);
   const regenEnergy = useGameStore((s) => s.regenEnergy);
   const { hapticFeedback } = useTelegram();
@@ -35,31 +34,35 @@ export function TapScreen() {
         return;
       }
 
-      incrementBalance();
       hapticFeedback();
-
-      // Spawn flying +N at click coordinates
-      const container = containerRef.current;
-      if (!container) return;
-
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const particle = document.createElement('div');
-      particle.className = 'tap-particle';
-      particle.textContent = `+${tapPower}`;
-      particle.style.left = `${x}px`;
-      particle.style.top = `${y}px`;
-
-      container.appendChild(particle);
-
-      // Remove from DOM after animation completes to prevent memory leaks
-      particle.addEventListener('animationend', () => {
-        particle.remove();
+      
+      // Create flying coin animation natively
+      const coin = document.createElement('div');
+      coin.className = 'flying-coin';
+      coin.textContent = `+${tapPower}`;
+      
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (rect) {
+        coin.style.left = `${e.clientX - rect.left}px`;
+        coin.style.top = `${e.clientY - rect.top}px`;
+      }
+      
+      containerRef.current?.appendChild(coin);
+      
+      // Cleanup DOM element after animation completes to prevent memory leaks
+      coin.addEventListener('animationend', () => {
+        coin.remove();
       });
+
+      // Add visual press effect to the big coin
+      if (coinRef.current) {
+        coinRef.current.style.transform = 'scale(0.95) translateZ(-10px)';
+        setTimeout(() => {
+          if (coinRef.current) coinRef.current.style.transform = 'scale(1) translateZ(0)';
+        }, 100);
+      }
     },
-    [consumeEnergy, incrementBalance, hapticFeedback, tapPower]
+    [consumeEnergy, hapticFeedback, tapPower]
   );
 
   const formatBalance = (num: number): string => {
