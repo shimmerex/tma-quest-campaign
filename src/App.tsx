@@ -76,19 +76,24 @@ function App() {
       )}
 
       {!hasOnboarded && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'var(--game-bg)', zIndex: 200, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', textAlign: 'center' }}>
-          <div style={{ fontSize: '64px', marginBottom: '24px' }}>🚀</div>
-          <h1 style={{ fontSize: '32px', marginBottom: '16px', color: 'var(--tg-theme-text-color)' }}>Welcome to TMA Quest!</h1>
-          <p style={{ color: 'var(--tg-theme-hint-color)', fontSize: '16px', marginBottom: '32px', lineHeight: '1.5' }}>
-            Tap the coin to earn tokens, buy upgrades to boost your income, and complete quests to dominate the leagues!
-          </p>
-          <div style={{ background: 'var(--game-surface-alpha)', padding: '16px', borderRadius: '16px', marginBottom: '32px', width: '100%' }}>
-            <h3 style={{ margin: '0 0 8px', color: 'var(--game-coin-primary)' }}>Starter Bonus</h3>
-            <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>+1,000 🪙</p>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: '#000000', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a1a2e, #16213e)', border: '1px solid rgba(255,255,255,0.1)', padding: '40px 24px', borderRadius: '32px', width: '100%', maxWidth: '360px', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}>
+            <div style={{ fontSize: '72px', marginBottom: '24px' }}>🎁</div>
+            <h1 style={{ fontSize: '28px', marginBottom: '12px', color: '#fff', fontWeight: '900' }}>Welcome to TMA Quest!</h1>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '15px', marginBottom: '32px', lineHeight: '1.6' }}>
+              Tap the coin to earn tokens, buy upgrades, and dominate the leaderboards.
+            </p>
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '20px', borderRadius: '20px', marginBottom: '32px' }}>
+              <h3 style={{ margin: '0 0 8px', color: '#f5a623', fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>Starter Bonus</h3>
+              <p style={{ margin: 0, fontSize: '32px', fontWeight: '900', color: '#fff' }}>+1,000 🪙</p>
+            </div>
+            <button 
+              onClick={handleOnboard} 
+              style={{ width: '100%', padding: '18px', borderRadius: '100px', background: 'linear-gradient(90deg, #ff9d00, #ff5e00)', color: '#fff', fontSize: '18px', fontWeight: '900', border: 'none', cursor: 'pointer', boxShadow: '0 8px 20px rgba(255, 157, 0, 0.4)' }}
+            >
+              Claim & Start Earning
+            </button>
           </div>
-          <button onClick={handleOnboard} style={{ width: '100%', padding: '16px', borderRadius: '16px', background: 'var(--game-accent)', color: '#fff', fontSize: '18px', fontWeight: 'bold', border: 'none' }}>
-            Start Earning
-          </button>
         </div>
       )}
     </div>

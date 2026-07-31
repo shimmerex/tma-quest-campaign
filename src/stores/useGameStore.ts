@@ -272,7 +272,20 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ offlineEarnings: 0 });
   },
 
-  completeOnboarding: () => set({ hasOnboarded: true }),
+  completeOnboarding: async () => {
+    const { tgId } = get();
+    // Optimistic update
+    set(state => ({ hasOnboarded: true, balance: state.balance + 1000 }));
+    try {
+      await fetch(`${API_URL}/user/onboard`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tgId })
+      });
+    } catch (e) {
+      console.error('Failed to onboard', e);
+    }
+  },
   completeQuest: (id: string) =>
     set((s) => ({
       quests: s.quests.map((q) =>

@@ -110,6 +110,35 @@ app.post('/api/game/tap', async (req, res) => {
   }
 });
 
+// Onboarding Endpoint
+app.post('/api/user/onboard', async (req, res) => {
+  try {
+    const { tgId } = req.body;
+    if (!tgId) return res.status(400).json({ error: 'Missing telegram ID' });
+
+    const user = await prisma.user.findUnique({ where: { id: tgId } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    if (user.hasOnboarded) {
+      return res.status(400).json({ error: 'Already onboarded' });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: tgId },
+      data: {
+        hasOnboarded: true,
+        balance: user.balance + 1000
+      },
+      include: { upgrades: true, quests: true }
+    });
+
+    res.json({ user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 // Buy Upgrade Endpoint
 app.post('/api/game/upgrade', async (req, res) => {
   try {
