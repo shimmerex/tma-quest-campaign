@@ -27,56 +27,58 @@ export function TapScreen() {
     return () => clearInterval(interval);
   }, [regenEnergy]);
 
-  const handleTap = useCallback(
+    const handleTap = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
-      // Prevent default to stop text selection / ghost clicks
-      // Note: React's synthetic event preventDefault doesn't always work for touch actions, 
-      // so CSS user-select is also important.
+      // Prevent default text selection
+      e.preventDefault();
 
       if (!consumeEnergy()) {
-        // Optional: play an error haptic if out of energy
+        hapticFeedback();
         return;
       }
 
       hapticFeedback();
       
-      // Limit active particles to prevent DOM lag
       const activeParticles = document.querySelectorAll('.tap-particle');
       if (activeParticles.length > 20) {
         activeParticles[0].remove();
       }
 
-      // Create flying coin animation natively
       const coin = document.createElement('div');
       coin.className = 'tap-particle';
       coin.textContent = `+${tapPower}`;
       
       const rect = containerRef.current?.getBoundingClientRect();
       if (rect) {
-        coin.style.left = `${e.clientX - rect.left}px`;
-        coin.style.top = `${e.clientY - rect.top}px`;
+        // Add random scatter for organic feel
+        const scatterX = (Math.random() - 0.5) * 40;
+        const scatterY = (Math.random() - 0.5) * 40;
+        const rotation = (Math.random() - 0.5) * 30;
+        
+        coin.style.left = `${e.clientX - rect.left + scatterX}px`;
+        coin.style.top = `${e.clientY - rect.top + scatterY}px`;
+        coin.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
       }
       
       containerRef.current?.appendChild(coin);
       
-      // Cleanup DOM element after animation completes to prevent memory leaks
       coin.addEventListener('animationend', () => {
         coin.remove();
       });
 
-      // Add visual press effect to the big coin
       if (coinRef.current) {
-        coinRef.current.style.transform = 'scale(0.95) translateZ(-10px)';
+        // More aggressive 3D push effect
+        coinRef.current.style.transform = `scale(0.92) translateY(4px) rotateX(10deg)`;
         setTimeout(() => {
-          if (coinRef.current) coinRef.current.style.transform = 'scale(1) translateZ(0)';
-        }, 100);
+          if (coinRef.current) coinRef.current.style.transform = 'scale(1) translateY(0) rotateX(0)';
+        }, 80);
       }
     },
     [consumeEnergy, hapticFeedback, tapPower]
   );
 
   const formatBalance = (num: number): string => {
-    if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+    if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(2)}M`;
     if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
     return num.toLocaleString();
   };
@@ -105,63 +107,64 @@ export function TapScreen() {
 
   return (
     <div className="tap-screen" ref={containerRef}>
-      <div className="tap-header" style={{ width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-          <button 
-            className="profile-btn" 
-            onClick={() => setShowProfile(true)}
-            style={{ width: '44px', height: '44px', borderRadius: '22px', background: 'var(--game-surface-alpha)', border: '1px solid var(--game-border-alpha)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', cursor: 'pointer', outline: 'none' }}
-          >
-            👤
+      <div className="tap-header-v2">
+        <div className="header-top-row">
+          <button className="profile-badge-btn" onClick={() => setShowProfile(true)}>
+            <div className="avatar-circle">🧑‍🚀</div>
+            <div className="user-info-stack">
+              <span className="username-label">Player</span>
+              <span className="league-label" style={{ color: currentLeague.color }}>
+                {currentLeague.name} ›
+              </span>
+            </div>
           </button>
           
-          <div className="league-info" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, margin: '0 16px' }}>
-            <div className="league-badge" style={{ color: currentLeague.color, fontSize: '13px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              {currentLeague.name} League
+          <div className="profit-badge">
+            <span className="profit-label">Profit per hour</span>
+            <span className="profit-val">+{useGameStore(s => s.profitPerHour)}</span>
+          </div>
+        </div>
+
+        <div className="balance-display-v2">
+          <span className="balance-icon-huge">🪙</span>
+          <span className="balance-val-huge">{formatBalance(balance)}</span>
+        </div>
+        
+        {nextLeague && (
+          <div className="league-tracker">
+            <div className="tracker-labels">
+              <span>{currentLeague.name}</span>
+              <span>{leagueProgress.toFixed(1)}%</span>
             </div>
-            {nextLeague && (
-              <div className="league-progress-container" style={{ width: '100%', maxWidth: '140px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', marginTop: '6px', overflow: 'hidden' }}>
-                <div className="league-progress-fill" style={{ width: `${leagueProgress}%`, height: '100%', background: currentLeague.color, transition: 'width 0.3s ease' }} />
-              </div>
-            )}
+            <div className="tracker-bar">
+              <div className="tracker-fill" style={{ width: `${leagueProgress}%`, background: currentLeague.color }} />
+            </div>
           </div>
-
-          <div style={{ width: '44px' }} /> {/* Spacer to balance header */}
-        </div>
-
-        <div className="balance-value" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span className="balance-icon" style={{ fontSize: '48px' }}>🪙</span>
-            <span className="balance-number" style={{ fontSize: '56px', fontWeight: '900' }}>{formatBalance(balance)}</span>
-          </div>
-        </div>
+        )}
       </div>
 
-      <div className="coin-area">
-        <div className="coin-glow" />
+      <div className="coin-interaction-area">
+        <div className="coin-glow-v2" />
         <div
           ref={coinRef}
-          className={`coin ${!hasEnergy ? 'coin-disabled' : ''}`}
-          onPointerDown={hasEnergy ? handleTap : undefined}
-          style={{ touchAction: 'none' }}
-          role="button"
-          tabIndex={0}
-          id="tap-coin"
+          className={`tap-coin-v2 ${!hasEnergy ? 'disabled' : ''}`}
+          onPointerDown={handleTap}
         >
-          <div className="coin-inner">
-            <div className="coin-shine" />
-            <span className="coin-symbol">💰</span>
+          <div className="coin-surface">
+            <div className="coin-shine-v2" />
+            <div className="coin-logo">💰</div>
           </div>
         </div>
       </div>
 
-      <div className="tap-footer">
-        <div className="energy-stats" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 'bold', marginBottom: '8px', color: 'var(--game-coin-primary)' }}>
-          <span>⚡ {Math.floor(energy)}</span>
-          <span style={{ color: 'var(--tg-theme-hint-color, #8b8fa3)' }}>/ {maxEnergy}</span>
+      <div className="tap-footer-v2">
+        <div className="energy-stats-v2">
+          <span className="energy-icon">⚡</span>
+          <span className="energy-current">{Math.floor(energy)}</span>
+          <span className="energy-max">/ {maxEnergy}</span>
         </div>
-        <div className="energy-bar">
-          <div className="energy-fill" style={{ width: `${energyPercent}%`, transition: 'width 0.3s ease-out' }} />
+        <div className="energy-bar-v2">
+          <div className="energy-fill-v2" style={{ width: `${energyPercent}%` }} />
         </div>
       </div>
 
