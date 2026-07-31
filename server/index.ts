@@ -118,7 +118,7 @@ app.post('/api/game/upgrade', async (req, res) => {
     
     if (!user) return res.status(404).json({ error: 'User not found' });
 
-    const userUpgrade = user.upgrades.find(u => u.upgradeId === upgradeId);
+    const userUpgrade = user.upgrades.find((u: { upgradeId: string }) => u.upgradeId === upgradeId);
     const currentLevel = userUpgrade ? userUpgrade.level : 0;
     
     // Server calculates true cost
