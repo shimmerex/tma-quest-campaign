@@ -48,17 +48,25 @@ app.post('/api/auth/sync', async (req, res) => {
       return res.json({ user, offlineEarnings: 0 });
     }
 
-    // Calculate offline earnings securely
+    // Calculate offline energy regeneration
     const now = new Date();
+    const secondsPassed = Math.floor((now.getTime() - user.lastLogin.getTime()) / 1000);
+    const regeneratedEnergy = Math.min(
+      user.maxEnergy,
+      user.energy + (secondsPassed * user.energyRegenRate)
+    );
+
+    // Calculate offline earnings securely
     const hoursPassed = (now.getTime() - user.lastLogin.getTime()) / (1000 * 60 * 60);
     const cappedHours = Math.max(0, Math.min(hoursPassed, 12));
     const offlineEarnings = Math.floor(user.profitPerHour * cappedHours);
     
-    // Update lastLogin
+    // Update lastLogin, energy, and balance
     const updatedUser = await prisma.user.update({
       where: { id: tgId },
       data: { 
         lastLogin: now,
+        energy: regeneratedEnergy,
         balance: user.balance + offlineEarnings
       },
       include: { upgrades: true, quests: true }
