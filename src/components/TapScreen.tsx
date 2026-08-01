@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useGameStore } from '../stores/useGameStore';
 import { useTelegram } from '../hooks/useTelegram';
 import { useTonWallet, useTonConnectUI } from '@tonconnect/ui-react';
@@ -10,7 +10,6 @@ export function TapScreen() {
   const maxEnergy = useGameStore((s) => s.maxEnergy);
   const tapPower = useGameStore((s) => s.tapPower);
   const consumeEnergy = useGameStore((s) => s.consumeEnergy);
-  const regenEnergy = useGameStore((s) => s.regenEnergy);
   const { hapticFeedback } = useTelegram();
   const coinRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -19,15 +18,7 @@ export function TapScreen() {
   const wallet = useTonWallet();
   const [tonConnectUI] = useTonConnectUI();
 
-  // Regenerate energy every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      regenEnergy();
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [regenEnergy]);
-
-    const handleTap = useCallback(
+  const handleTap = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       // Prevent default text selection
       e.preventDefault();

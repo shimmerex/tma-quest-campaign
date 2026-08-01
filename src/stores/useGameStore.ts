@@ -154,6 +154,12 @@ export const useGameStore = create<GameState>((set, get) => ({
           return s ? { ...def, level: s.level } : def;
         });
 
+        const serverQuests = data.user.quests || [];
+        const mergedQuests = get().quests.map((q) => {
+          const sq = serverQuests.find((sq: any) => sq.questId === q.id);
+          return sq ? { ...q, completed: sq.completed } : q;
+        });
+
         set({
           balance: data.user.balance,
           energy: data.user.energy,
@@ -165,6 +171,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           hasOnboarded: data.user.hasOnboarded,
           lastEnergyUpdate: Date.now(),
           upgrades: mergedUpgrades,
+          quests: mergedQuests,
           isLoading: false
         });
       } else {
@@ -294,10 +301,35 @@ export const useGameStore = create<GameState>((set, get) => ({
       console.error('Failed to onboard', e);
     }
   },
-  completeQuest: (id: string) =>
-    set((s) => ({
+  completeQuest: async (id: string) => {
+    const state = get();
+    const quest = state.quests.find((q) => q.id === id);
+    if (!quest || quest.completed || state.isProcessing) return;
+
+    set({ isProcessing: true });
+    // Optimistic update
+    set(s => ({
+      balance: s.balance + quest.reward,
       quests: s.quests.map((q) =>
         q.id === id ? { ...q, completed: true } : q,
       ),
-    })),
+    }));
+
+    try {
+      const res = await fetch(`${API_URL}/game/quest`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tgId: state.tgId, questId: id, reward: quest.reward }),
+      });
+      if (!res.ok) {
+        console.error("Failed to complete quest on server");
+        get().syncWithServer(); // Revert
+      }
+    } catch (e) {
+      console.error(e);
+      get().syncWithServer(); // Revert
+    } finally {
+      set({ isProcessing: false });
+    }
+  },
 }));

@@ -20,6 +20,8 @@ function App() {
   const syncTaps = useGameStore((s) => s.syncTaps);
   const setTgId = useGameStore((s) => s.setTgId);
 
+  const regenEnergy = useGameStore((s) => s.regenEnergy);
+
   useEffect(() => {
     ready();
     expand();
@@ -32,12 +34,20 @@ function App() {
     syncWithServer();
 
     // Setup periodic sync for batched taps every 2 seconds
-    const interval = setInterval(() => {
+    const syncInterval = setInterval(() => {
       syncTaps();
     }, 2000);
 
-    return () => clearInterval(interval);
-  }, [expand, ready, syncWithServer, syncTaps, setTgId]);
+    // Regenerate energy globally every second
+    const regenInterval = setInterval(() => {
+      regenEnergy();
+    }, 1000);
+
+    return () => {
+      clearInterval(syncInterval);
+      clearInterval(regenInterval);
+    };
+  }, [expand, ready, syncWithServer, syncTaps, setTgId, regenEnergy]);
 
   const handleClaimOffline = () => {
     claimOfflineEarnings();

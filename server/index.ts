@@ -213,6 +213,50 @@ app.post('/api/game/upgrade', async (req, res) => {
   }
 });
 
+// Complete Quest Endpoint
+app.post('/api/game/quest', async (req, res) => {
+  try {
+    const { tgId, questId, reward } = req.body;
+    
+    const user = await prisma.user.findUnique({ 
+      where: { id: tgId },
+      include: { quests: true }
+    });
+    
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    const existingQuest = user.quests.find((q: any) => q.questId === questId);
+    if (existingQuest && existingQuest.completed) {
+      return res.status(400).json({ error: 'Quest already completed' });
+    }
+
+    // Transaction
+    const [updatedUser] = await prisma.$transaction([
+      prisma.user.update({
+        where: { id: tgId },
+        data: { balance: user.balance + reward },
+        include: { quests: true }
+      }),
+      prisma.userQuest.upsert({
+        where: {
+          userId_questId: { userId: tgId, questId }
+        },
+        update: { completed: true },
+        create: {
+          userId: tgId,
+          questId,
+          completed: true
+        }
+      })
+    ]);
+
+    res.json({ user: updatedUser });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 TMA Backend running on http://localhost:${PORT}`);
 });
